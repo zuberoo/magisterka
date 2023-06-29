@@ -1,0 +1,100 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Nazwa administratora "
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Hasło administratora "
+      }
+    },
+    "vmCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Liczba maszyn wirtualnych do utworzenia"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "Rozmiar maszyny wirtualnej"
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Nazwa konta Storage"
+      }
+    }
+  },
+  "variables": {
+    "osDiskType": "Standard_LRS",
+    "nicNamePrefix": "myvm-nic",
+    "vmNamePrefix": "myvm"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-04-01",
+      "name": "[concat(variables('vmNamePrefix'), copyIndex())]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "virtualMachineLoop",
+        "count": "[parameters('vmCount')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(variables('vmNamePrefix'), copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "18.04-LTS",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('vmNamePrefix'), copyIndex(), '-osdisk')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[variables('osDiskType')]"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 
+              concat(variables('nicNamePrefix'), copyIndex()))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network

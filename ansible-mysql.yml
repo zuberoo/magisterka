@@ -1,0 +1,30 @@
+- name: Konfiguracja serwera z bazą danych MySQL
+  hosts: all
+  become: true
+  vars:
+    mysql_root_password: "0I38lr16FEv!"
+
+  tasks:
+    - name: Instalacja pakietu MySQL
+      apt:
+        name: mysql-server
+        state: present
+
+    - name: Uruchomienie serwisu MySQL
+      service:
+        name: mysql
+        state: started
+
+    - name: Utworzenie użytkownika i bazy danych
+      mysql_user:
+        name: mysqlUser
+        password: "{{ mysql_root_password }}"
+        priv: "*.*:ALL"
+        state: present
+
+    - name: Zmiana hasła dla użytkownika root
+      mysql_user:
+        name: root
+        password: "{{ mysql_root_password }}"
+        update_password: always
+        host: "{{ ansible_hostname }}"

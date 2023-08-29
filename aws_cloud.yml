@@ -2,7 +2,7 @@ Resources:
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
-    # Ubuntu 20.04 LTS AMI ID dla regionu US West 2 
+  
       ImageId: ami-0c94855ba95c71c99  
       InstanceType: t2.micro
   EC2Instance2:

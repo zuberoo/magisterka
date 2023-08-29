@@ -1,15 +1,15 @@
-# Inicjalizacja dostawcy Azure
+
 provider "azurerm" {
   features {}
 }
 
-# Tworzenie RG
+
 resource "azurerm_resource_group" "example" {
   name     = "BB-praca-magisterka"
   location = "East Europe"
 }
 
-# Tworzenie konta Storage
+
 resource "azurerm_storage_account" "example" {
   name                     = "storageBB"
   resource_group_name      = azurerm_resource_group.example.name
@@ -18,7 +18,7 @@ resource "azurerm_storage_account" "example" {
   account_replication_type = "LRS"
 }
 
-# Tworzenie maszyn wirtualnych
+
 resource "azurerm_virtual_machine" "example" {
   count                 = 5
   name                  = "myvmBB-${count.index}"
@@ -51,7 +51,7 @@ resource "azurerm_virtual_machine" "example" {
   }
 }
 
-# Tworzenie interfejsu sieciowego dla maszyn wirtualnych
+
 resource "azurerm_network_interface" "example" {
   count               = 5
   name                = "myvm-nic-${count.index}"
@@ -65,7 +65,7 @@ resource "azurerm_network_interface" "example" {
   }
 }
 
-# Tworzenie podsieci
+
 resource "azurerm_subnet" "example" {
   name                 = "my-subnet"
   resource_group_name  = azurerm_resource_group.example.name
@@ -73,7 +73,7 @@ resource "azurerm_subnet" "example" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-# Tworzenie wirtualnej sieci
+
 resource "azurerm_virtual_network" "example" {
   name                = "my-virtual-network"
   resource_group_name = azurerm_resource_group.example.name
